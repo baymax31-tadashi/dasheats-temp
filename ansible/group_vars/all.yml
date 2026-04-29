@@ -1,0 +1,44 @@
+# =============================================================================
+# Global Variables for All Hosts
+# =============================================================================
+
+# Application Configuration
+app_name: food-order-app
+app_version: latest
+app_port: 3000
+app_user: appuser
+app_group: appgroup
+
+# Docker Configuration
+docker_registry: your-registry.com
+docker_image: "{{ docker_registry }}/{{ app_name }}"
+docker_tag: "{{ app_version }}"
+
+# Kubernetes Configuration
+k8s_namespace: food-order
+k8s_replicas: 3
+
+# Node.js Configuration
+node_version: "20"
+pnpm_version: "8"
+
+# System Configuration
+timezone: UTC
+locale: en_US.UTF-8
+
+# Security
+ssh_port: 22
+firewall_enabled: true
+allowed_ports:
+  - "{{ ssh_port }}"
+  - "{{ app_port }}"
+  - 80
+  - 443
+
+# Logging
+log_level: info
+log_path: /var/log/{{ app_name }}
+
+# Health Check
+health_check_path: /api/health
+health_check_interval: 30

@@ -1,0 +1,22 @@
+# =============================================================================
+# Kubernetes Service for Food Ordering Application
+# =============================================================================
+# Exposes the Food Order application pods within the cluster
+# =============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: food-order-service
+  namespace: food-order
+  labels:
+    app: food-order
+spec:
+  type: ClusterIP
+  selector:
+    app: food-order
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP

@@ -1,0 +1,35 @@
+# =============================================================================
+# Kubernetes Ingress for Food Ordering Application
+# =============================================================================
+# Exposes the Food Order application to external traffic
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: food-order-ingress
+  namespace: food-order
+  labels:
+    app: food-order
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: food-order.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: food-order-service
+                port:
+                  number: 80
+  # Uncomment below for TLS/HTTPS support
+  # tls:
+  #   - hosts:
+  #       - food-order.example.com
+  #     secretName: food-order-tls

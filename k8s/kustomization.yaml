@@ -1,0 +1,28 @@
+# =============================================================================
+# Kustomization for Food Ordering Application
+# =============================================================================
+# Use with: kubectl apply -k k8s/
+# =============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: food-order
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+commonLabels:
+  app: food-order
+  managed-by: kustomize
+
+# Image configuration - update this for different environments
+images:
+  - name: food-order-app
+    newName: your-registry/food-order-app
+    newTag: latest

@@ -1,0 +1,17 @@
+# =============================================================================
+# Kubernetes ConfigMap for Food Ordering Application
+# =============================================================================
+# Stores non-sensitive configuration data for the application
+# =============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: food-order-config
+  namespace: food-order
+  labels:
+    app: food-order
+data:
+  NODE_ENV: "production"
+  HOSTNAME: "0.0.0.0"
+  PORT: "3000"

@@ -1,0 +1,13 @@
+# =============================================================================
+# Kubernetes Namespace for Food Ordering Application
+# =============================================================================
+# Creates a dedicated namespace to isolate the application resources
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: food-order
+  labels:
+    app: food-order
+    environment: production
