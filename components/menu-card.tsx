@@ -25,7 +25,7 @@ const spicyLabels = ['Mild', 'Medium', 'Spicy', 'Very Spicy']
 
 export function MenuCard({ item, onAddToOrder, onEdit, onDelete }: MenuCardProps) {
   return (
-    <Card className="group overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="group overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-2xl border-0 bg-card">
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden bg-muted">
         {item.image ? (

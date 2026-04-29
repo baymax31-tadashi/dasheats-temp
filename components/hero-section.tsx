@@ -10,7 +10,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onScrollToMenu }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background">
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-background border-b">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -28,14 +28,12 @@ export function HeroSection({ onScrollToMenu }: HeroSectionProps) {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
-              Delicious Food,{' '}
-              <span className="text-primary">Delivered</span>{' '}
-              to Your Door
+              Order <span className="text-primary">Food Online</span>, <br className="hidden md:block" />
+              Delivered to You in <span className="text-primary">30 mins</span>
             </h1>
             
             <p className="text-lg text-muted-foreground max-w-lg">
-              Order from our curated menu of restaurant-quality meals. Fresh ingredients, 
-              expert preparation, and fast delivery right to your doorstep.
+              Order from thousands of restaurants. Fast delivery, easy ordering, and your favorite food at your doorstep.
             </p>
             
             <div className="flex flex-wrap gap-4">

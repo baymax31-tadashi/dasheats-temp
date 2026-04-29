@@ -12,8 +12,15 @@ import { OrdersList } from '@/components/orders-list'
 import { FoodItemForm } from '@/components/food-item-form'
 import { HeroSection } from '@/components/hero-section'
 import { StatsDashboard } from '@/components/stats-dashboard'
+import { AdminSidebar } from '@/components/admin/sidebar'
+import { AdminDashboard } from '@/components/admin/dashboard'
+import { RestaurantInfo } from '@/components/admin/restaurant-info'
+import { Inventory } from '@/components/admin/inventory'
+import { Analytics } from '@/components/admin/analytics'
+import { Reviews } from '@/components/admin/reviews'
+import { OrdersDashboard } from '@/components/admin/orders-dashboard'
 import type { FoodItem, Order, OrderItem } from '@/lib/types'
-import { Plus, Utensils, Search, Github, Settings, LayoutDashboard, Menu, X } from 'lucide-react'
+import { Plus, Utensils, Search, Github, LayoutDashboard, Menu, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
@@ -30,6 +37,8 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [showAdmin, setShowAdmin] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [adminSidebarOpen, setAdminSidebarOpen] = useState(false)
+  const [adminActiveTab, setAdminActiveTab] = useState('overview')
   
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -184,6 +193,64 @@ export default function Home() {
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
+  // Render Admin Dashboard
+  if (showAdmin) {
+    return (
+      <main className="min-h-screen flex flex-col md:flex-row bg-background">
+        {/* Admin Sidebar */}
+        <AdminSidebar 
+          activeTab={adminActiveTab}
+          onTabChange={setAdminActiveTab}
+          onClose={() => setAdminSidebarOpen(false)}
+          isOpen={adminSidebarOpen}
+        />
+
+        {/* Admin Content */}
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+            <div className="px-4 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="md:hidden"
+                  onClick={() => setAdminSidebarOpen(!adminSidebarOpen)}
+                >
+                  {adminSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+                <h1 className="text-xl font-bold">Admin Panel</h1>
+              </div>
+
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAdmin(false)}
+                className="gap-2"
+              >
+                <Utensils className="h-4 w-4" />
+                Back to Shop
+              </Button>
+            </div>
+          </header>
+
+          {/* Admin Content Area */}
+          <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="max-w-7xl mx-auto">
+              {adminActiveTab === 'overview' && <AdminDashboard />}
+              {adminActiveTab === 'restaurant' && <RestaurantInfo />}
+              {adminActiveTab === 'inventory' && <Inventory />}
+              {adminActiveTab === 'orders' && <OrdersDashboard />}
+              {adminActiveTab === 'analytics' && <Analytics />}
+              {adminActiveTab === 'reviews' && <Reviews />}
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Render Customer Shop
   return (
     <main className="min-h-screen">
       {/* Header */}
@@ -195,20 +262,20 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-xl font-bold">FoodOrder</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Restaurant Management System</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">Order Your Favorite Food</p>
             </div>
           </div>
           
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-4">
             <Button 
-              variant={showAdmin ? "default" : "outline"} 
+              variant="outline" 
               size="sm"
-              onClick={() => setShowAdmin(!showAdmin)}
+              onClick={() => setShowAdmin(true)}
               className="gap-2"
             >
-              {showAdmin ? <LayoutDashboard className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
-              {showAdmin ? 'Dashboard' : 'Admin Mode'}
+              <LayoutDashboard className="h-4 w-4" />
+              Admin Mode
             </Button>
             <Button onClick={() => setIsFormOpen(true)} className="gap-2">
               <Plus className="h-4 w-4" />
@@ -239,13 +306,13 @@ export default function Home() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t p-4 space-y-3 bg-card">
             <Button 
-              variant={showAdmin ? "default" : "outline"} 
+              variant="outline" 
               size="sm"
-              onClick={() => { setShowAdmin(!showAdmin); setMobileMenuOpen(false) }}
+              onClick={() => { setShowAdmin(true); setMobileMenuOpen(false) }}
               className="w-full gap-2"
             >
-              {showAdmin ? <LayoutDashboard className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
-              {showAdmin ? 'Dashboard' : 'Admin Mode'}
+              <LayoutDashboard className="h-4 w-4" />
+              Admin Mode
             </Button>
             <Button onClick={() => { setIsFormOpen(true); setMobileMenuOpen(false) }} className="w-full gap-2">
               <Plus className="h-4 w-4" />
@@ -257,14 +324,6 @@ export default function Home() {
 
       {/* Hero Section */}
       <HeroSection onScrollToMenu={scrollToMenu} />
-
-      {/* Stats Dashboard (Admin Mode) */}
-      {showAdmin && (
-        <section className="container mx-auto px-4 py-6">
-          <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
-          <StatsDashboard />
-        </section>
-      )}
 
       {/* Main Content */}
       <div ref={menuRef} className="container mx-auto px-4 py-8">
