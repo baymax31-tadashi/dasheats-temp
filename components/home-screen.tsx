@@ -39,7 +39,7 @@ export function HomeScreen({ stats, onNavigate }: HomeScreenProps) {
           <div className="space-y-6">
             <div className="space-y-2">
               <h1 className="text-5xl md:text-6xl font-bold text-balance">
-                Welcome to <span className="text-primary">FoodOrder</span>
+                Welcome to <span className="text-primary">DashEats</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl">
                 Your all-in-one restaurant management platform. Manage menus, track orders, and grow your business.

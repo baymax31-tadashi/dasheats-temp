@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'FoodOrder - Restaurant Management System',
+  title: 'DashEats - Restaurant Management System',
   description: 'Simple restaurant and online food ordering management system with CI/CD pipeline',
   generator: 'v0.app',
   icons: {

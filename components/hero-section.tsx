@@ -29,7 +29,7 @@ export function HeroSection({ onScrollToMenu }: HeroSectionProps) {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
               Order <span className="text-primary">Food Online</span>, <br className="hidden md:block" />
-              Delivered to You in <span className="text-primary">30 mins</span>
+              Get it on <span className="text-primary">DashEats</span>
             </h1>
             
             <p className="text-lg text-muted-foreground max-w-lg">
