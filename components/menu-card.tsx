@@ -68,7 +68,7 @@ export function MenuCard({ item, onAddToOrder, onEdit, onDelete }: MenuCardProps
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-lg leading-tight text-balance">{item.name}</h3>
           <span className="text-xl font-bold text-primary whitespace-nowrap">
-            ${item.price.toFixed(2)}
+            ₹{item.price.toFixed(2)}
           </span>
         </div>
         

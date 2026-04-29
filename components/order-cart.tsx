@@ -78,7 +78,7 @@ export function OrderCart({
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{item.foodItemName}</p>
                   <p className="text-sm text-muted-foreground">
-                    ${item.price.toFixed(2)} each
+                    ₹{item.price.toFixed(2)} each
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -120,29 +120,29 @@ export function OrderCart({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Tax (8%)</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>₹{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Delivery Fee</span>
                 {deliveryFee === 0 ? (
                   <span className="text-green-600 font-medium">FREE</span>
                 ) : (
-                  <span>${deliveryFee.toFixed(2)}</span>
+                  <span>₹{deliveryFee.toFixed(2)}</span>
                 )}
               </div>
               {deliveryFee > 0 && (
                 <p className="text-xs text-muted-foreground text-center py-1 bg-muted rounded">
-                  Add ${(50 - subtotal).toFixed(2)} more for free delivery
+                  Add ₹{(50 - subtotal).toFixed(2)} more for free delivery
                 </p>
               )}
               <Separator />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span className="text-primary">${total.toFixed(2)}</span>
+                <span className="text-primary">₹{total.toFixed(2)}</span>
               </div>
             </div>
             
@@ -213,7 +213,7 @@ export function OrderCart({
             
             <Button type="submit" className="w-full gap-2 h-12 text-base" disabled={isLoading || !customerName.trim()}>
               <CreditCard className="h-5 w-5" />
-              {isLoading ? 'Processing...' : `Place Order - $${total.toFixed(2)}`}
+              {isLoading ? 'Processing...' : `Place Order - ₹${total.toFixed(2)}`}
             </Button>
           </form>
         </CardFooter>

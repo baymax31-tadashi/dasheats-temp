@@ -77,7 +77,7 @@ export function HomeScreen({ stats, onNavigate }: HomeScreenProps) {
               <span className="text-muted-foreground text-sm font-medium">Revenue</span>
               <TrendingUp className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-3xl font-bold">${data.totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">₹{data.totalRevenue.toFixed(2)}</p>
             <p className="text-xs text-muted-foreground">Total generated</p>
           </Card>
 

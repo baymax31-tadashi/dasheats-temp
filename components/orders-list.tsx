@@ -192,13 +192,13 @@ export function OrdersList({ orders, onUpdateStatus, onDelete }: OrdersListProps
                         <span>
                           <span className="font-medium">{item.quantity}x</span> {item.foodItemName}
                         </span>
-                        <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-between px-3 py-2 bg-primary/5 font-bold">
                     <span>Total</span>
-                    <span className="text-primary">${order.totalAmount.toFixed(2)}</span>
+                    <span className="text-primary">₹{order.totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
 

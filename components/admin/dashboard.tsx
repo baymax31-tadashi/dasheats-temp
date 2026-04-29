@@ -39,7 +39,7 @@ export function AdminDashboard() {
   const statCards = [
     {
       label: 'Total Revenue',
-      value: `$${stats.totalRevenue.toFixed(2)}`,
+      value: `₹${stats.totalRevenue.toFixed(2)}`,
       change: '+12.5%',
       icon: DollarSign,
       color: 'text-emerald-600',
@@ -131,7 +131,7 @@ export function AdminDashboard() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Avg Order Value</p>
-                <p className="text-2xl font-bold">${stats.avgOrderValue.toFixed(2)}</p>
+                <p className="text-2xl font-bold">₹{stats.avgOrderValue.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>

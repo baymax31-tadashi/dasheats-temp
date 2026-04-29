@@ -49,7 +49,7 @@ export function Analytics() {
               <Tooltip />
               <Legend />
               <Bar yAxisId="left" dataKey="orders" fill="var(--color-primary)" name="Orders" />
-              <Bar yAxisId="right" dataKey="revenue" fill="var(--color-chart-2)" name="Revenue ($)" />
+              <Bar yAxisId="right" dataKey="revenue" fill="var(--color-chart-2)" name="Revenue (₹)" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -123,7 +123,7 @@ export function Analytics() {
               <Tooltip />
               <Legend />
               <Bar yAxisId="left" dataKey="orders" fill="var(--color-primary)" name="Orders" />
-              <Bar yAxisId="right" dataKey="revenue" fill="var(--color-chart-3)" name="Revenue ($)" />
+              <Bar yAxisId="right" dataKey="revenue" fill="var(--color-chart-3)" name="Revenue (₹)" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
