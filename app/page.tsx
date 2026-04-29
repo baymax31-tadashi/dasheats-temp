@@ -1,15 +1,19 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import useSWR, { mutate } from 'swr'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MenuCard } from '@/components/menu-card'
 import { OrderCart } from '@/components/order-cart'
 import { OrdersList } from '@/components/orders-list'
 import { FoodItemForm } from '@/components/food-item-form'
+import { HeroSection } from '@/components/hero-section'
+import { StatsDashboard } from '@/components/stats-dashboard'
 import type { FoodItem, Order, OrderItem } from '@/lib/types'
-import { Plus, Utensils } from 'lucide-react'
+import { Plus, Utensils, Search, Github, Settings, LayoutDashboard, Menu, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
@@ -22,6 +26,26 @@ export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editItem, setEditItem] = useState<FoodItem | null>(null)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [showAdmin, setShowAdmin] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  const scrollToMenu = () => {
+    menuRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Filter menu items
+  const filteredItems = menuItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter
+    return matchesSearch && matchesCategory
+  })
+
+  const categories = ['all', ...new Set(menuItems.map(item => item.category))]
 
   const addToCart = useCallback((item: FoodItem) => {
     setCartItems(prev => {
@@ -57,17 +81,23 @@ export default function Home() {
     setCartItems(prev => prev.filter(i => i.foodItemId !== foodItemId))
   }, [])
 
-  const placeOrder = useCallback(async (customerName: string) => {
+  const placeOrder = useCallback(async (
+    customerName: string, 
+    customerPhone?: string, 
+    customerAddress?: string, 
+    notes?: string
+  ) => {
     setIsPlacingOrder(true)
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cartItems, customerName })
+        body: JSON.stringify({ items: cartItems, customerName, customerPhone, customerAddress, notes })
       })
       if (res.ok) {
         setCartItems([])
         mutate('/api/orders')
+        mutate('/api/stats')
         toast.success('Order placed successfully!')
       } else {
         toast.error('Failed to place order')
@@ -88,6 +118,7 @@ export default function Home() {
         })
         if (res.ok) {
           mutate('/api/menu')
+          mutate('/api/stats')
           toast.success('Item updated successfully!')
         }
       } else {
@@ -98,6 +129,7 @@ export default function Home() {
         })
         if (res.ok) {
           mutate('/api/menu')
+          mutate('/api/stats')
           toast.success('Item added successfully!')
         }
       }
@@ -112,6 +144,7 @@ export default function Home() {
       const res = await fetch(`/api/menu/${id}`, { method: 'DELETE' })
       if (res.ok) {
         mutate('/api/menu')
+        mutate('/api/stats')
         toast.success('Item deleted successfully!')
       }
     } catch {
@@ -128,6 +161,7 @@ export default function Home() {
       })
       if (res.ok) {
         mutate('/api/orders')
+        mutate('/api/stats')
         toast.success('Order status updated!')
       }
     } catch {
@@ -140,6 +174,7 @@ export default function Home() {
       const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' })
       if (res.ok) {
         mutate('/api/orders')
+        mutate('/api/stats')
         toast.success('Order deleted!')
       }
     } catch {
@@ -147,38 +182,174 @@ export default function Home() {
     }
   }, [])
 
+  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
   return (
     <main className="min-h-screen">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Utensils className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">FoodOrder</h1>
+            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+              <Utensils className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">FoodOrder</h1>
+              <p className="text-xs text-muted-foreground hidden sm:block">Restaurant Management System</p>
+            </div>
           </div>
-          <Button onClick={() => setIsFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Item
+          
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-4">
+            <Button 
+              variant={showAdmin ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setShowAdmin(!showAdmin)}
+              className="gap-2"
+            >
+              {showAdmin ? <LayoutDashboard className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
+              {showAdmin ? 'Dashboard' : 'Admin Mode'}
+            </Button>
+            <Button onClick={() => setIsFormOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Item
+            </Button>
+            <a 
+              href="https://github.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+          </div>
+          
+          {/* Mobile Menu Toggle */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t p-4 space-y-3 bg-card">
+            <Button 
+              variant={showAdmin ? "default" : "outline"} 
+              size="sm"
+              onClick={() => { setShowAdmin(!showAdmin); setMobileMenuOpen(false) }}
+              className="w-full gap-2"
+            >
+              {showAdmin ? <LayoutDashboard className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
+              {showAdmin ? 'Dashboard' : 'Admin Mode'}
+            </Button>
+            <Button onClick={() => { setIsFormOpen(true); setMobileMenuOpen(false) }} className="w-full gap-2">
+              <Plus className="h-4 w-4" />
+              Add Item
+            </Button>
+          </div>
+        )}
       </header>
 
-      <div className="container mx-auto px-4 py-6">
+      {/* Hero Section */}
+      <HeroSection onScrollToMenu={scrollToMenu} />
+
+      {/* Stats Dashboard (Admin Mode) */}
+      {showAdmin && (
+        <section className="container mx-auto px-4 py-6">
+          <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
+          <StatsDashboard />
+        </section>
+      )}
+
+      {/* Main Content */}
+      <div ref={menuRef} className="container mx-auto px-4 py-8">
         <Tabs defaultValue="menu" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="menu">Menu</TabsTrigger>
-            <TabsTrigger value="orders">Orders ({orders.length})</TabsTrigger>
-          </TabsList>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <TabsList className="grid w-full sm:w-auto grid-cols-2">
+              <TabsTrigger value="menu" className="gap-2">
+                <Utensils className="h-4 w-4" />
+                Menu ({menuItems.length})
+              </TabsTrigger>
+              <TabsTrigger value="orders" className="gap-2 relative">
+                Orders
+                {orders.filter(o => o.status === 'pending').length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                    {orders.filter(o => o.status === 'pending').length}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Cart Badge for Mobile */}
+            {cartItemCount > 0 && (
+              <div className="sm:hidden fixed bottom-4 right-4 z-50">
+                <Button size="lg" className="rounded-full shadow-lg gap-2 pr-5">
+                  <span className="bg-primary-foreground text-primary h-6 w-6 rounded-full flex items-center justify-center text-sm font-bold">
+                    {cartItemCount}
+                  </span>
+                  View Cart
+                </Button>
+              </div>
+            )}
+          </div>
 
           <TabsContent value="menu" className="space-y-6">
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search menu items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat} value={cat} className="capitalize">
+                      {cat === 'all' ? 'All Categories' : cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid lg:grid-cols-3 gap-6">
+              {/* Menu Grid */}
               <div className="lg:col-span-2">
                 {menuLoading ? (
-                  <p className="text-muted-foreground">Loading menu...</p>
-                ) : menuItems.length === 0 ? (
-                  <p className="text-muted-foreground">No items in the menu. Add some!</p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="h-80 rounded-xl bg-muted animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Utensils className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+                    <p className="text-muted-foreground font-medium">No items found</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {searchQuery || categoryFilter !== 'all' 
+                        ? 'Try adjusting your search or filters' 
+                        : 'Add some items to your menu'}
+                    </p>
+                    <Button onClick={() => setIsFormOpen(true)} className="mt-4 gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add First Item
+                    </Button>
+                  </div>
                 ) : (
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {menuItems.map(item => (
+                    {filteredItems.map(item => (
                       <MenuCard
                         key={item.id}
                         item={item}
@@ -193,7 +364,9 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <div>
+              
+              {/* Cart Sidebar */}
+              <div className="hidden lg:block">
                 <OrderCart
                   items={cartItems}
                   onUpdateQuantity={updateCartQuantity}
@@ -203,11 +376,26 @@ export default function Home() {
                 />
               </div>
             </div>
+            
+            {/* Mobile Cart */}
+            <div className="lg:hidden">
+              <OrderCart
+                items={cartItems}
+                onUpdateQuantity={updateCartQuantity}
+                onRemoveItem={removeFromCart}
+                onPlaceOrder={placeOrder}
+                isLoading={isPlacingOrder}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="orders">
             {ordersLoading ? (
-              <p className="text-muted-foreground">Loading orders...</p>
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
+                ))}
+              </div>
             ) : (
               <OrdersList
                 orders={orders}
@@ -219,6 +407,31 @@ export default function Home() {
         </Tabs>
       </div>
 
+      {/* Footer */}
+      <footer className="border-t bg-muted/30 mt-12">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <Utensils className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="font-semibold">FoodOrder</span>
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Restaurant Management System with CI/CD Pipeline
+            </p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>Built with Next.js</span>
+              <span>|</span>
+              <span>Docker + Kubernetes</span>
+              <span>|</span>
+              <span>Jenkins CI/CD</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Food Item Form Modal */}
       <FoodItemForm
         open={isFormOpen}
         onClose={() => {

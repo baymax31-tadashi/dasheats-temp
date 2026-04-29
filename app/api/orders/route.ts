@@ -11,7 +11,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { items, customerName } = body
+    const { items, customerName, customerPhone, customerAddress, notes } = body
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -27,14 +27,20 @@ export async function POST(request: Request) {
       )
     }
 
-    // Calculate total amount
-    const totalAmount = items.reduce((sum: number, item: { price: number; quantity: number }) => {
+    // Calculate total amount with tax and delivery
+    const subtotal = items.reduce((sum: number, item: { price: number; quantity: number }) => {
       return sum + (item.price * item.quantity)
     }, 0)
+    const tax = subtotal * 0.08
+    const deliveryFee = subtotal > 50 ? 0 : 4.99
+    const totalAmount = subtotal + tax + deliveryFee
 
     const newOrder = store.createOrder({
       items,
       customerName,
+      customerPhone,
+      customerAddress,
+      notes,
       totalAmount
     })
 

@@ -1,19 +1,27 @@
 {
   "info": {
     "name": "Food Order API",
-    "description": "API collection for the Food Ordering Management System",
+    "description": "Complete API collection for the Food Ordering Management System with CI/CD Pipeline. This collection covers all CRUD operations for menu items and orders.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3000",
-      "type": "string"
+      "type": "string",
+      "description": "Base URL for the API"
+    },
+    {
+      "key": "k8sUrl",
+      "value": "http://food-order.local",
+      "type": "string",
+      "description": "Kubernetes ingress URL"
     }
   ],
   "item": [
     {
       "name": "Health",
+      "description": "Health check endpoints for monitoring and CI/CD pipeline verification",
       "item": [
         {
           "name": "Health Check",
@@ -25,14 +33,49 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "health"]
             },
-            "description": "Check if the API is healthy and running"
+            "description": "Check if the API is healthy and running. Returns status and timestamp."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Healthy Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"healthy\",\n  \"timestamp\": \"2024-01-15T10:30:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "description": "Dashboard statistics endpoints",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats"]
+            },
+            "description": "Get dashboard statistics including total items, orders, revenue, and order counts by status"
+          },
+          "response": [
+            {
+              "name": "Stats Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"totalItems\": 8,\n  \"totalOrders\": 15,\n  \"totalRevenue\": 342.50,\n  \"pendingOrders\": 3,\n  \"completedOrders\": 10\n}"
+            }
+          ]
         }
       ]
     },
     {
       "name": "Menu",
+      "description": "CRUD operations for menu items (food items)",
       "item": [
         {
           "name": "Get All Menu Items",
@@ -44,7 +87,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "menu"]
             },
-            "description": "Retrieve all food items from the menu"
+            "description": "Retrieve all food items from the menu with all details including images, ratings, prep time, and dietary info"
           },
           "response": []
         },
@@ -63,7 +106,7 @@
           "response": []
         },
         {
-          "name": "Add New Menu Item",
+          "name": "Add New Menu Item (Full)",
           "request": {
             "method": "POST",
             "header": [
@@ -74,14 +117,37 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Margherita Pizza\",\n  \"description\": \"Classic Italian pizza with tomato sauce, mozzarella, and fresh basil\",\n  \"price\": 14.99,\n  \"category\": \"main\",\n  \"available\": true\n}"
+              "raw": "{\n  \"name\": \"Grilled Salmon\",\n  \"description\": \"Fresh Atlantic salmon with lemon herb butter, served with seasonal vegetables and rice pilaf\",\n  \"price\": 24.99,\n  \"category\": \"main\",\n  \"available\": true,\n  \"image\": \"/images/steak.jpg\",\n  \"rating\": 4.7,\n  \"prepTime\": 20,\n  \"calories\": 450,\n  \"spicyLevel\": 0,\n  \"isVegetarian\": false,\n  \"isVegan\": false,\n  \"allergens\": [\"fish\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/menu",
               "host": ["{{baseUrl}}"],
               "path": ["api", "menu"]
             },
-            "description": "Add a new food item to the menu"
+            "description": "Add a new food item to the menu with all optional fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Add New Menu Item (Basic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Garden Salad\",\n  \"description\": \"Fresh mixed greens with cherry tomatoes, cucumber, and house dressing\",\n  \"price\": 8.99,\n  \"category\": \"appetizer\",\n  \"available\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu"]
+            },
+            "description": "Add a new food item with only required fields"
           },
           "response": []
         },
@@ -97,14 +163,37 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Burger\",\n  \"price\": 15.99,\n  \"available\": true\n}"
+              "raw": "{\n  \"name\": \"Premium Cheeseburger\",\n  \"price\": 16.99,\n  \"available\": true,\n  \"rating\": 4.9,\n  \"prepTime\": 12\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/menu/1",
               "host": ["{{baseUrl}}"],
               "path": ["api", "menu", "1"]
             },
-            "description": "Update an existing food item"
+            "description": "Update an existing food item (partial update supported)"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Availability",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"available\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "1"]
+            },
+            "description": "Toggle the availability of a menu item"
           },
           "response": []
         },
@@ -126,6 +215,7 @@
     },
     {
       "name": "Orders",
+      "description": "CRUD operations for customer orders",
       "item": [
         {
           "name": "Get All Orders",
@@ -137,7 +227,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "orders"]
             },
-            "description": "Retrieve all orders"
+            "description": "Retrieve all orders sorted by creation date (newest first)"
           },
           "response": []
         },
@@ -156,7 +246,7 @@
           "response": []
         },
         {
-          "name": "Create New Order",
+          "name": "Create New Order (Full)",
           "request": {
             "method": "POST",
             "header": [
@@ -167,19 +257,42 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerName\": \"John Doe\",\n  \"items\": [\n    {\n      \"foodItemId\": \"1\",\n      \"foodItemName\": \"Classic Burger\",\n      \"quantity\": 2,\n      \"price\": 12.99\n    },\n    {\n      \"foodItemId\": \"4\",\n      \"foodItemName\": \"Fresh Lemonade\",\n      \"quantity\": 2,\n      \"price\": 4.99\n    }\n  ]\n}"
+              "raw": "{\n  \"customerName\": \"John Doe\",\n  \"customerPhone\": \"(555) 123-4567\",\n  \"customerAddress\": \"123 Main St, Apt 4B, New York, NY 10001\",\n  \"notes\": \"Please ring the doorbell. Extra napkins please.\",\n  \"items\": [\n    {\n      \"foodItemId\": \"1\",\n      \"foodItemName\": \"Classic Cheeseburger\",\n      \"quantity\": 2,\n      \"price\": 14.99\n    },\n    {\n      \"foodItemId\": \"2\",\n      \"foodItemName\": \"Margherita Pizza\",\n      \"quantity\": 1,\n      \"price\": 18.99\n    },\n    {\n      \"foodItemId\": \"8\",\n      \"foodItemName\": \"Chocolate Lava Cake\",\n      \"quantity\": 2,\n      \"price\": 9.99\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/orders",
               "host": ["{{baseUrl}}"],
               "path": ["api", "orders"]
             },
-            "description": "Create a new order"
+            "description": "Create a new order with full customer details and notes"
           },
           "response": []
         },
         {
-          "name": "Update Order Status",
+          "name": "Create New Order (Basic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Jane Smith\",\n  \"items\": [\n    {\n      \"foodItemId\": \"4\",\n      \"foodItemName\": \"Caesar Salad\",\n      \"quantity\": 1,\n      \"price\": 12.99\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Create a new order with minimum required fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status - Preparing",
           "request": {
             "method": "PATCH",
             "header": [
@@ -197,7 +310,76 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "orders", "1"]
             },
-            "description": "Update the status of an order (pending, preparing, ready, delivered, cancelled)"
+            "description": "Update order status to 'preparing'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status - Ready",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ready\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Update order status to 'ready'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status - Delivered",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"delivered\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Update order status to 'delivered'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status - Cancelled",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Update order status to 'cancelled'"
           },
           "response": []
         },
