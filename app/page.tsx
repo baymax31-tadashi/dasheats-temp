@@ -3,7 +3,6 @@
 import { useState, useCallback, useRef } from 'react'
 import useSWR, { mutate } from 'swr'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MenuCard } from '@/components/menu-card'
@@ -12,6 +11,7 @@ import { OrdersList } from '@/components/orders-list'
 import { FoodItemForm } from '@/components/food-item-form'
 import { HeroSection } from '@/components/hero-section'
 import { StatsDashboard } from '@/components/stats-dashboard'
+import { HomeScreen } from '@/components/home-screen'
 import { AdminSidebar } from '@/components/admin/sidebar'
 import { AdminDashboard } from '@/components/admin/dashboard'
 import { RestaurantInfo } from '@/components/admin/restaurant-info'
@@ -20,12 +20,12 @@ import { Analytics } from '@/components/admin/analytics'
 import { Reviews } from '@/components/admin/reviews'
 import { OrdersDashboard } from '@/components/admin/orders-dashboard'
 import type { FoodItem, Order, OrderItem } from '@/lib/types'
-import { Plus, Utensils, Search, Github, LayoutDashboard, Menu, X } from 'lucide-react'
+import { Plus, Utensils, Search, Github, LayoutDashboard, Menu, X, Home, ShoppingBag, ListOrdered } from 'lucide-react'
 import { toast } from 'sonner'
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-export default function Home() {
+export default function RootPage() {
   const { data: menuItems = [], isLoading: menuLoading } = useSWR<FoodItem[]>('/api/menu', fetcher)
   const { data: orders = [], isLoading: ordersLoading } = useSWR<Order[]>('/api/orders', fetcher)
   
@@ -35,7 +35,7 @@ export default function Home() {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [showAdmin, setShowAdmin] = useState(false)
+  const [mainTab, setMainTab] = useState('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [adminSidebarOpen, setAdminSidebarOpen] = useState(false)
   const [adminActiveTab, setAdminActiveTab] = useState('overview')
@@ -193,66 +193,9 @@ export default function Home() {
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
-  // Render Admin Dashboard
-  if (showAdmin) {
-    return (
-      <main className="min-h-screen flex flex-col md:flex-row bg-background">
-        {/* Admin Sidebar */}
-        <AdminSidebar 
-          activeTab={adminActiveTab}
-          onTabChange={setAdminActiveTab}
-          onClose={() => setAdminSidebarOpen(false)}
-          isOpen={adminSidebarOpen}
-        />
-
-        {/* Admin Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-            <div className="px-4 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="md:hidden"
-                  onClick={() => setAdminSidebarOpen(!adminSidebarOpen)}
-                >
-                  {adminSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                </Button>
-                <h1 className="text-xl font-bold">Admin Panel</h1>
-              </div>
-
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAdmin(false)}
-                className="gap-2"
-              >
-                <Utensils className="h-4 w-4" />
-                Back to Shop
-              </Button>
-            </div>
-          </header>
-
-          {/* Admin Content Area */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
-              {adminActiveTab === 'overview' && <AdminDashboard />}
-              {adminActiveTab === 'restaurant' && <RestaurantInfo />}
-              {adminActiveTab === 'inventory' && <Inventory />}
-              {adminActiveTab === 'orders' && <OrdersDashboard />}
-              {adminActiveTab === 'analytics' && <Analytics />}
-              {adminActiveTab === 'reviews' && <Reviews />}
-            </div>
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  // Render Customer Shop
+  // Render main content with tabs
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -262,22 +205,55 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-xl font-bold">FoodOrder</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Order Your Favorite Food</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">Restaurant Management</p>
             </div>
           </div>
           
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             <Button 
-              variant="outline" 
+              variant={mainTab === 'home' ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => setShowAdmin(true)}
+              onClick={() => setMainTab('home')}
+              className="gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+            <Button 
+              variant={mainTab === 'menu' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setMainTab('menu')}
+              className="gap-2"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Menu
+            </Button>
+            <Button 
+              variant={mainTab === 'orders' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setMainTab('orders')}
+              className="gap-2 relative"
+            >
+              <ListOrdered className="h-4 w-4" />
+              Orders
+              {orders.filter(o => o.status === 'pending').length > 0 && (
+                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                  {orders.filter(o => o.status === 'pending').length}
+                </span>
+              )}
+            </Button>
+            <div className="border-l mx-2"></div>
+            <Button 
+              variant={mainTab === 'admin' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMainTab('admin')}
               className="gap-2"
             >
               <LayoutDashboard className="h-4 w-4" />
-              Admin Mode
+              Admin
             </Button>
-            <Button onClick={() => setIsFormOpen(true)} className="gap-2">
+            <Button onClick={() => setIsFormOpen(true)} className="gap-2" size="sm">
               <Plus className="h-4 w-4" />
               Add Item
             </Button>
@@ -304,17 +280,49 @@ export default function Home() {
         
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t p-4 space-y-3 bg-card">
+          <div className="md:hidden border-t p-4 space-y-2 bg-card">
             <Button 
-              variant="outline" 
+              variant={mainTab === 'home' ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => { setShowAdmin(true); setMobileMenuOpen(false) }}
-              className="w-full gap-2"
+              onClick={() => { setMainTab('home'); setMobileMenuOpen(false) }}
+              className="w-full justify-start gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+            <Button 
+              variant={mainTab === 'menu' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => { setMainTab('menu'); setMobileMenuOpen(false) }}
+              className="w-full justify-start gap-2"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Menu
+            </Button>
+            <Button 
+              variant={mainTab === 'orders' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => { setMainTab('orders'); setMobileMenuOpen(false) }}
+              className="w-full justify-start gap-2 relative"
+            >
+              <ListOrdered className="h-4 w-4" />
+              Orders
+              {orders.filter(o => o.status === 'pending').length > 0 && (
+                <span className="ml-auto h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                  {orders.filter(o => o.status === 'pending').length}
+                </span>
+              )}
+            </Button>
+            <Button 
+              variant={mainTab === 'admin' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setMainTab('admin'); setMobileMenuOpen(false) }}
+              className="w-full justify-start gap-2"
             >
               <LayoutDashboard className="h-4 w-4" />
-              Admin Mode
+              Admin
             </Button>
-            <Button onClick={() => { setIsFormOpen(true); setMobileMenuOpen(false) }} className="w-full gap-2">
+            <Button onClick={() => { setIsFormOpen(true); setMobileMenuOpen(false) }} className="w-full justify-start gap-2" size="sm">
               <Plus className="h-4 w-4" />
               Add Item
             </Button>
@@ -322,42 +330,24 @@ export default function Home() {
         )}
       </header>
 
-      {/* Hero Section */}
-      <HeroSection onScrollToMenu={scrollToMenu} />
-
       {/* Main Content */}
-      <div ref={menuRef} className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="menu" className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <TabsList className="grid w-full sm:w-auto grid-cols-2">
-              <TabsTrigger value="menu" className="gap-2">
-                <Utensils className="h-4 w-4" />
-                Menu ({menuItems.length})
-              </TabsTrigger>
-              <TabsTrigger value="orders" className="gap-2 relative">
-                Orders
-                {orders.filter(o => o.status === 'pending').length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
-                    {orders.filter(o => o.status === 'pending').length}
-                  </span>
-                )}
-              </TabsTrigger>
-            </TabsList>
-            
-            {/* Cart Badge for Mobile */}
-            {cartItemCount > 0 && (
-              <div className="sm:hidden fixed bottom-4 right-4 z-50">
-                <Button size="lg" className="rounded-full shadow-lg gap-2 pr-5">
-                  <span className="bg-primary-foreground text-primary h-6 w-6 rounded-full flex items-center justify-center text-sm font-bold">
-                    {cartItemCount}
-                  </span>
-                  View Cart
-                </Button>
-              </div>
-            )}
-          </div>
+      <div className="flex-1 overflow-y-auto">
+        {/* Home Tab */}
+        {mainTab === 'home' && (
+          <HomeScreen 
+            stats={{
+              totalOrders: orders.length,
+              totalRevenue: orders.reduce((sum, order) => sum + order.totalAmount, 0),
+              activeUsers: new Set(orders.map(o => o.customerName)).size,
+              completedOrders: orders.filter(o => o.status === 'completed').length
+            }}
+            onNavigate={setMainTab}
+          />
+        )}
 
-          <TabsContent value="menu" className="space-y-6">
+        {/* Menu Tab */}
+        {mainTab === 'menu' && (
+          <div ref={menuRef} className="container mx-auto px-4 py-8 space-y-6">
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
@@ -446,9 +436,28 @@ export default function Home() {
                 isLoading={isPlacingOrder}
               />
             </div>
-          </TabsContent>
 
-          <TabsContent value="orders">
+            {/* Cart Badge for Mobile */}
+            {cartItemCount > 0 && (
+              <div className="sm:hidden fixed bottom-4 right-4 z-50">
+                <Button size="lg" className="rounded-full shadow-lg gap-2 pr-5">
+                  <span className="bg-primary-foreground text-primary h-6 w-6 rounded-full flex items-center justify-center text-sm font-bold">
+                    {cartItemCount}
+                  </span>
+                  View Cart
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Orders Tab */}
+        {mainTab === 'orders' && (
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold">Orders</h2>
+              <p className="text-muted-foreground mt-2">Manage and track all customer orders</p>
+            </div>
             {ordersLoading ? (
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {[...Array(3)].map((_, i) => (
@@ -462,8 +471,50 @@ export default function Home() {
                 onDelete={handleDeleteOrder}
               />
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
+
+        {/* Admin Tab */}
+        {mainTab === 'admin' && (
+          <div className="flex-1 flex flex-col md:flex-row bg-background">
+            {/* Admin Sidebar */}
+            <AdminSidebar 
+              activeTab={adminActiveTab}
+              onTabChange={setAdminActiveTab}
+              onClose={() => setAdminSidebarOpen(false)}
+              isOpen={adminSidebarOpen}
+            />
+
+            {/* Admin Content */}
+            <div className="flex-1 flex flex-col">
+              {/* Admin Header */}
+              <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 md:hidden">
+                <div className="px-4 py-4 flex items-center justify-between">
+                  <h2 className="text-lg font-bold">Admin Panel</h2>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => setAdminSidebarOpen(!adminSidebarOpen)}
+                  >
+                    {adminSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                  </Button>
+                </div>
+              </header>
+
+              {/* Admin Content Area */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-8">
+                <div className="max-w-7xl mx-auto">
+                  {adminActiveTab === 'overview' && <AdminDashboard />}
+                  {adminActiveTab === 'restaurant' && <RestaurantInfo />}
+                  {adminActiveTab === 'inventory' && <Inventory />}
+                  {adminActiveTab === 'orders' && <OrdersDashboard />}
+                  {adminActiveTab === 'analytics' && <Analytics />}
+                  {adminActiveTab === 'reviews' && <Reviews />}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
