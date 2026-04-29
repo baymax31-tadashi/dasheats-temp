@@ -44,7 +44,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, isOpen = true }:
                 <UtensilsCrossed className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="font-bold text-sm">FoodOrder</h2>
+                <h2 className="font-bold text-sm">DashEats</h2>
                 <p className="text-xs text-muted-foreground">Admin Panel</p>
               </div>
             </div>

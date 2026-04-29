@@ -26,10 +26,10 @@ export function RestaurantInfo() {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [info, setInfo] = useState<RestaurantInfo>({
-    name: 'FoodOrder Restaurant',
+    name: 'DashEats Restaurant',
     description: 'Premium restaurant with a wide variety of cuisines',
     phone: '+1 (555) 123-4567',
-    email: 'info@foodorder.com',
+    email: 'info@dasheats.com',
     address: '123 Main St, City, State 12345',
     deliveryTime: '30-45 minutes',
     deliveryRadius: '5 km',

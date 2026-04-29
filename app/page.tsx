@@ -254,7 +254,7 @@ export default function RootPage() {
                 <Utensils className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">FoodOrder</h1>
+                <h1 className="text-xl font-bold">DashEats</h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">Order Your Favorite Food</p>
               </div>
             </div>
@@ -434,7 +434,7 @@ export default function RootPage() {
                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                   <Utensils className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold">FoodOrder</span>
+                <span className="font-semibold">DashEats</span>
               </div>
               <p className="text-sm text-muted-foreground text-center">
                 Restaurant Management System with CI/CD Pipeline
@@ -466,7 +466,7 @@ export default function RootPage() {
               <Utensils className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">FoodOrder</h1>
+              <h1 className="text-xl font-bold">DashEats</h1>
               <p className="text-xs text-muted-foreground hidden sm:block">Order Your Favorite Food</p>
             </div>
           </div>
